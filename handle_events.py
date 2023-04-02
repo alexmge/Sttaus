@@ -1,3 +1,5 @@
+## @package handle_events
+# This module contains the functions that handle the events.
 # The events are stored in the events.json file, which is a JSON file.
 # The file is structured like this:
 # {
@@ -22,7 +24,7 @@
 # - 2 hour before the event -> "@epita L'événement "<event name>" se termine dans 2 heures"
 # - when the event is passed -> "L'événement "<event name>" est passé"
 #
-# The scheduler is called every 5 minutes to check for events.
+# The scheduler is called every 30 seconds to check for events.
 #
 # The way it knows when to send a message is by
 # checking the field "next_reminder" in the events.json file.
@@ -36,17 +38,20 @@ import datetime
 import discord
 from discord.ext import tasks, commands
 
-class Scheduler(commands.Cog):
+## The Scheduler class is, as its name suggests, a scheduler.
+# It manages the events and sends reminders to the calendar channel.
+# It is called every 30 seconds.
+class Scheduler():
     
-    def __init__(self, bot):
-        self.bot = bot
-        self.scheduler.start()
+    def __init__(self, client):
+        self.client = client
+        self.CALENDAR_CHANNEL_ID = os.getenv('CALENDAR_CHANNEL')
 
     @tasks.loop(seconds=5)
     async def scheduler(self):
-        # Check if the events.json file exists
+        # Check if the events.json file exists and throw an error if it doesn't
         if not os.path.exists("events.json"):
-            return
+            raise FileNotFoundError("The events.json file does not exist")
         # Open the file and load the events
         with open("events.json", "r") as f:
             events = json.load(f)
@@ -59,27 +64,21 @@ class Scheduler(commands.Cog):
                 # Delete the event
                 events["events"].remove(event)
                 # Send a message to the channel
-                channel = self.bot.get_channel(1090343024413917274)
-                await channel.send("L'événement " + event["name"] + " est passé")
+                await self.client.get_channel(int(self.CALENDAR_CHANNEL_ID)).send("L'événement " + event["name"] + " est passé")
             # Check the next reminder
             elif event["next_reminder"] != None:
                 # Get the date and time of the next reminder
                 next_reminder = datetime.datetime.strptime(event["next_reminder"], "%d%m%Y%H%M")
                 # Check if the next reminder is due
-                if next_reminder < now:
+                if next_reminder <= now:
                     # Send a message to the channel
-                    channel = self.bot.get_channel(1090343024413917274)
-                    await channel.send("L'événement " + event["name"] + " se termine dans " + event["next_reminder"])
+                    await self.client.get_channel(int(self.CALENDAR_CHANNEL_ID)).send("L'événement " + event["name"] + " se termine dans " + compute_time_difference(event["date"], event["time"]))
                     # Update the next reminder
                     event["next_reminder"] = compute_next_reminder(event["date"], event["time"])
 
         # Save the events
         with open("events.json", "w") as f:
-            json.dump(events, f)
-
-    @scheduler.before_loop
-    async def before_scheduler(self):
-        await self.bot.wait_until_ready()
+            json.dump(events, f, indent=4, separators=(',', ': '))
 
     async def add_event(self, ctx, name: str, date: str, time: str):
         # Add the event to the scheduler
@@ -163,3 +162,28 @@ def compute_next_reminder(date, time):
     # if the event is less than 2 hours or passed, return None
     return None
     
+# returns the time difference in weeks, days and hours between now and the date and time given in parameters
+# if weeks > 0, days and hours are not returned
+# if days > 0, hours is not returned
+def compute_time_difference(date, time):
+    # Get the date and time of the event
+    event_date = datetime.datetime.strptime(date, "%d%m%Y")
+    event_time = datetime.datetime.strptime(time, "%H%M")
+    # concatenate the date and time
+    event_date = datetime.datetime.combine(event_date, event_time.time())
+    # Get the difference between now and the event
+    difference = event_date - datetime.datetime.now()
+    # add 1 minute
+    difference += datetime.timedelta(minutes=1)
+    # Compute the number of weeks, days and hours
+    weeks = difference.days // 7
+    days = difference.days % 7
+    hours = difference.seconds // 3600
+    minutes = (difference.seconds % 3600) // 60
+    # Return the time difference
+    if weeks > 0:
+        return str(weeks) + " semaines"
+    elif days > 0:
+        return str(days) + " jours"
+    else: 
+        return str(hours) + " heures " + str(minutes) + " minutes"

@@ -1,4 +1,4 @@
-# bot.py
+
 import os
 
 # import the discord.py module and the commands extension for slash commands
@@ -17,6 +17,7 @@ import info as info
 # load the .env file and get the token
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
+CALENDAR_CHANNEL_ID = os.getenv('CALENDAR_CHANNEL')
 
 # define the class for the bot
 class Sttaus(discord.Client):
@@ -32,22 +33,28 @@ class Sttaus(discord.Client):
 # create the client
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
+intents.guilds = True
 client = Sttaus(intents=intents)
 
 # create the command tree for slash commands
 tree = app_commands.CommandTree(client=client)
 
-scheduler = he.Scheduler(client)
+scheduler = he.Scheduler(client=client)
 
 ################################################################
 ######################## Slash commands ########################
 ################################################################
 
-# Command that returns some infos about the bot
 @tree.command(name="info", description="Display some infos about the bot")
 async def feur(ctx):
     infos = info.get_bot_info()
     await ctx.response.send_message(embed=infos)
+
+@tree.command(name="commands", description="Display the list of commands")
+async def commands(ctx):
+    commands = info.get_bot_commands()
+    await ctx.response.send_message(embed=commands)
 
 # Command that adds an event to the scheduler
 @tree.command(name="add_event", description="Add an event to the scheduler")
@@ -88,6 +95,7 @@ async def list(ctx):
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
     await tree.sync()
+    await scheduler.scheduler.start()
 
 # run the client
 client.run(TOKEN)
