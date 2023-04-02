@@ -48,10 +48,12 @@ async def respond_feur(message):
     # surround the text with a prefix or a suffix and send it
     await message.channel.send(surround_feur(text))
 
+
 def pronouns_feur(text):
     text = text.replace("tu", "je")
     text = text.replace("m'", "t'")
     return text
+
 
 def surround_feur(text):
     # choose either a prefix or a suffix
