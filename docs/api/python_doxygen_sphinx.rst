@@ -51,4 +51,13 @@ Slash Commands
          
                   Usage: /list_events
             
-      
+
+.. py:method:: feature_request()
+   
+            Sends a feature request to the developer.
+
+            .. code-block:: none
+         
+                  Usage: /feature_request <message>
+            
+                  Example: /feature_request "I want to see this feature!"

@@ -62,3 +62,16 @@ class SlashCommands():
         @self.tree.command(name="list_events", description="List the events in the scheduler")
         async def list(ctx):
             await self.scheduler.list_events(ctx)
+        
+        ## /feature_request command
+        # Command that sends a feature request to the bot owner
+        # @param request The feature request
+        @self.tree.command(name="feature_request", description="Send a feature request to the bot owner")
+        async def feature_request(ctx, request: str):
+            # Check for arguments validity
+            if not request:
+                await ctx.response.send_message("Usage: /feature_request <request>")
+                return
+            # Send the feature request to the bot owner
+            await self.client.get_user(info.get_owner_id()).send(f"Feature request from {ctx.author.name}#{ctx.author.discriminator}: {request}")
+            await ctx.response.send_message("Your feature request has been sent to the bot owner")

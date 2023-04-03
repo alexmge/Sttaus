@@ -51,6 +51,15 @@ def get_bot_commands():
     embed.add_field(name="/list_events", value="Liste les événements de l'agenda", inline=True)
     embed.add_field(name="\u200b", value="\u200b", inline=False)
 
+    embed.add_field(name="/feature_request", value="Envoie une requête de fonctionnalité au créateur du bot", inline=False)
+    embed.add_field(name="\u200b", value="\u200b", inline=False)
+
     # add footer
     embed.set_footer(text="\"git sttaus\" Nicolas, 2023")
     return embed
+
+## @Function: get_owner_id
+# This function returns the id of the bot owner
+# @return: The id of the bot owner
+def get_owner_id():
+    return 581402949524258817
