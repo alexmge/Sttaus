@@ -11,6 +11,8 @@ jobs:
       - name: Install dependencies
         run: |
           pip install sphinx sphinx_rtd_theme
+          sudo apt-get install -y doxygen
+          sudo apt-get install -y breathe
       - name: Sphinx build
         run: |
           sphinx-build docs _build
