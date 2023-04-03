@@ -1,27 +1,20 @@
-
 import os
-
 # import the discord.py module and the commands extension for slash commands
 import discord
 from discord import app_commands
-import asyncio
-
 # import the dotenv module to load the .env file
 from dotenv import load_dotenv
-
 # import custom modules
 import handle_quoi as hq
 import handle_events as he
-import info as info
+import slash_commands as sc
 
 # load the .env file and get the token
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-CALENDAR_CHANNEL_ID = os.getenv('CALENDAR_CHANNEL')
 
 # define the class for the bot
 class Sttaus(discord.Client):
-
     # define the function that will be called when a message is received
     async def on_message(self, message):
         # if the message contains any occurrence of "quoi"
@@ -37,64 +30,18 @@ intents.members = True
 intents.guilds = True
 client = Sttaus(intents=intents)
 
-# create the command tree for slash commands
-tree = app_commands.CommandTree(client=client)
-
+# create the scheduler
 scheduler = he.Scheduler(client=client)
 
-################################################################
-######################## Slash commands ########################
-################################################################
-
-@tree.command(name="info", description="Display some infos about the bot")
-async def feur(ctx):
-    infos = info.get_bot_info()
-    await ctx.response.send_message(embed=infos)
-
-@tree.command(name="commands", description="Display the list of commands")
-async def commands(ctx):
-    commands = info.get_bot_commands()
-    await ctx.response.send_message(embed=commands)
-
-# Command that adds an event to the scheduler
-@tree.command(name="add_event", description="Add an event to the scheduler")
-async def add(ctx, name: str, date: str, time: str):
-    # Check for arguments validity
-    if not name or not date or not time:
-        await ctx.response.send_message("Usage: /add <name> <date> <time>")
-        return
-    if not date.isnumeric() or not time.isnumeric():
-        await ctx.response.send_message("Date and time must be numbers")
-        return
-    if len(date) != 8 or len(time) != 4:
-        await ctx.response.send_message("Date must be in the format DDMMYYYY and time must be in the format HHMM")
-        return
-    # Add the event to the scheduler
-    await scheduler.add_event(ctx, name, date, time)
-
-# Command that removes an event from the scheduler
-@tree.command(name="remove_event", description="Remove an event from the scheduler")
-async def remove(ctx, name: str):
-    # Check for arguments validity
-    if not name:
-        await ctx.response.send_message("Usage: /remove <name>")
-        return
-    # Remove the event from the scheduler
-    await scheduler.remove_event(ctx, name)
-
-# Command that lists the events in the scheduler in an embed
-@tree.command(name="list_events", description="List the events in the scheduler")
-async def list(ctx):
-    await scheduler.list_events(ctx)
-
-################################################################
-################################################################
+# create the slash commands tree
+cog = sc.SlashCommands(scheduler=scheduler, client=client)
+cog.init_slash_commands()
 
 # define the function that will be called when the bot is ready
 @client.event
 async def on_ready():
     print(f'{client.user} has connected to Discord!')
-    await tree.sync()
+    await cog.tree.sync()
     await scheduler.scheduler.start()
 
 # run the client
