@@ -47,7 +47,7 @@ class Scheduler():
         self.client = client
         self.CALENDAR_CHANNEL_ID = os.getenv('CALENDAR_CHANNEL')
 
-    @tasks.loop(seconds=5)
+    @tasks.loop(seconds=30)
     async def scheduler(self):
         # Check if the events.json file exists and throw an error if it doesn't
         if not os.path.exists("events.json"):

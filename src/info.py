@@ -20,7 +20,8 @@ def get_bot_info():
     embed.add_field(name="Version", value="0.1", inline=True)
     embed.add_field(name="Language", value="Python", inline=True)
     embed.add_field(name="Framework", value="discord.py", inline=True)
-    embed.add_field(name="Source code", value="https://github.com/alexmge/Sttaus")
+    embed.add_field(name="Source code", value="https://github.com/alexmge/Sttaus", inline=False)
+    embed.add_field(name="Documentation", value="https://alexmge.github.io/Sttaus/", inline=False)
     embed.add_field(name="\u200b", value="\u200b", inline=False)
 
     # add footer
@@ -31,7 +32,7 @@ def get_bot_info():
 # This function returns an embed containing the list of commands available
 # @return: An embed containing the list of commands available
 def get_bot_commands():
-    embed = discord.Embed(title="Sttaus", description="Liste des commandes disponibles", color=0xeee657)
+    embed = discord.Embed(title="Sttaus", description="Liste des commandes disponibles\n Voir la documentation pour plus de détails : https://alexmge.github.io/Sttaus/", color=0xeee657)
     
     #add thumbnail
     embed.set_thumbnail(url="https://i0.wp.com/blog.knoldus.com/wp-content/uploads/2021/05/git-flow.png?fit=275%2C275&ssl=1")
