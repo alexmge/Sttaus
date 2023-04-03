@@ -38,6 +38,11 @@ import datetime
 import discord
 from discord.ext import tasks, commands
 
+# get the path of the current file
+path = os.path.dirname(os.path.abspath(__file__))
+# path to events.json
+events_path = path + "/events.json"
+
 ## The Scheduler class is, as its name suggests, a scheduler.
 # It manages the events and sends reminders to the calendar channel.
 # It is called every 30 seconds.
@@ -50,10 +55,10 @@ class Scheduler():
     @tasks.loop(seconds=30)
     async def scheduler(self):
         # Check if the events.json file exists and throw an error if it doesn't
-        if not os.path.exists("events.json"):
+        if not os.path.exists(events_path):
             raise FileNotFoundError("The events.json file does not exist")
         # Open the file and load the events
-        with open("events.json", "r") as f:
+        with open(events_path, "r") as f:
             events = json.load(f)
         # Get the current date and time
         now = datetime.datetime.now()
@@ -77,18 +82,18 @@ class Scheduler():
                     event["next_reminder"] = compute_next_reminder(event["date"], event["time"])
 
         # Save the events
-        with open("events.json", "w") as f:
+        with open(events_path, "w") as f:
             json.dump(events, f, indent=4, separators=(',', ': '))
 
     async def add_event(self, ctx, name: str, date: str, time: str):
         # Add the event to the scheduler
         # Check if the events.json file exists
-        if not os.path.exists("events.json"):
+        if not os.path.exists(events_path):
             # Create the file
-            with open("events.json", "w") as f:
+            with open(events_path, "w") as f:
                 json.dump({"events": []}, f)
         # Open the file and load the events
-        with open("events.json", "r") as f:
+        with open(events_path, "r") as f:
             events = json.load(f)
         # Add the event to the list if name not already present
         for event in events["events"]:
@@ -106,25 +111,25 @@ class Scheduler():
         
         events["events"].append({"name": name, "date": date, "time": time, "next_reminder": next_reminder})
         # Save the events
-        with open("events.json", "w") as f:
+        with open(events_path, "w") as f:
             json.dump(events, f, indent=4, separators=(',', ': '))
         await ctx.response.send_message("L'événement " + name + " a été ajouté au scheduler")
     
     async def remove_event(self, ctx, name: str):
         # Remove an event from the scheduler
         # Check if the events.json file exists
-        if not os.path.exists("events.json"):
+        if not os.path.exists(events_path):
             await ctx.response.send_message("Aucun événement n'est enregistré")
             return
         # Open the file and load the events
-        with open("events.json", "r") as f:
+        with open(events_path, "r") as f:
             events = json.load(f)
         # Remove the event from the list
         for event in events["events"]:
             if event["name"] == name:
                 events["events"].remove(event)
                 # Save the events
-                with open("events.json", "w") as f:
+                with open(events_path, "w") as f:
                     json.dump(events, f, indent=4, separators=(',', ': '))
                 await ctx.response.send_message("L'événement " + name + " a été supprimé du scheduler")
                 return
@@ -133,11 +138,11 @@ class Scheduler():
     # List the events and send them to the channel in an embed
     async def list_events(self, ctx):
         # Check if the events.json file exists
-        if not os.path.exists("events.json"):
+        if not os.path.exists(events_path):
             await ctx.response.send_message("Aucun événement n'est enregistré")
             return
         # Open the file and load the events
-        with open("events.json", "r") as f:
+        with open(events_path, "r") as f:
             events = json.load(f)
         # Create the embed
         embed = discord.Embed(title="Liste des événements", description="Voici la liste des événements enregistrés : ", color=0x00ff00)
