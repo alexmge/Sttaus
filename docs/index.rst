@@ -24,4 +24,8 @@ Table of Contents
    :caption: Contents:
 
    self
-   api/index
+   contents/index
+
+*Source code* : `GitHub`_
+
+.. _GitHub: https://github.com/alexmge/Sttaus

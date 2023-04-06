@@ -28,8 +28,8 @@ suffixes = [" en vrai",
 async def respond_feur(message):
     # simulate thinking
     await human.simulate(message)
-
-    text = message.content
+    
+    text = message.content.lower()
 
     # clean the text
     text = strip_feur(text)
@@ -50,7 +50,7 @@ async def respond_feur(message):
 
 
 def pronouns_feur(text):
-    text = text.replace("tu", "je")
+    text = text.replace("tu", "il")
     text = text.replace("m'", "t'")
     return text
 
