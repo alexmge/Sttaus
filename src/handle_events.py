@@ -50,7 +50,8 @@ class Scheduler():
     
     def __init__(self, client):
         self.client = client
-        self.CALENDAR_CHANNEL_ID = os.getenv('CALENDAR_CHANNEL')
+        self.CALENDAR_CHANNEL_ID = int(os.getenv('CALENDAR_CHANNEL'))
+        self.CALENDAR_ROLE = int(os.getenv('CALENDAR_ROLE'))
 
     @tasks.loop(seconds=30)
     async def scheduler(self):
@@ -76,8 +77,10 @@ class Scheduler():
                 next_reminder = datetime.datetime.strptime(event["next_reminder"], "%d%m%Y%H%M")
                 # Check if the next reminder is due
                 if next_reminder <= now:
+                    # build ping
+                    ping = "<@&" + str(self.CALENDAR_ROLE) + ">"
                     # Send a message to the channel
-                    await self.client.get_channel(int(self.CALENDAR_CHANNEL_ID)).send("L'événement " + event["name"] + " se termine dans " + compute_time_difference(event["date"], event["time"]))
+                    await self.client.get_channel(self.CALENDAR_CHANNEL_ID).send(ping + " L'événement " + event["name"] + " se termine dans " + compute_time_difference(event["date"], event["time"]))
                     # Update the next reminder
                     event["next_reminder"] = compute_next_reminder(event["date"], event["time"])
 
