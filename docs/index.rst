@@ -28,4 +28,8 @@ Table of Contents
 
 *Source code* : `GitHub`_
 
+*Development status* : `Trello`_
+
 .. _GitHub: https://github.com/alexmge/Sttaus
+
+.. _Trello: https://trello.com/b/5aKRG1aS/sttaus-dev-status

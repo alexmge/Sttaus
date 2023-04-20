@@ -22,6 +22,7 @@ def get_bot_info():
     embed.add_field(name="Framework", value="discord.py", inline=True)
     embed.add_field(name="Source code", value="https://github.com/alexmge/Sttaus", inline=False)
     embed.add_field(name="Documentation", value="https://alexmge.github.io/Sttaus/", inline=False)
+    embed.add_field(name="Development status", value="https://trello.com/b/5aKRG1aS/sttaus-dev-status", inline=False)
     embed.add_field(name="\u200b", value="\u200b", inline=False)
 
     # add footer
