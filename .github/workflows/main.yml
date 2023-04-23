@@ -1,0 +1,15 @@
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  fetch:
+    runs-on: self-hosted
+    steps:
+      - name: "Pull changes from repo"
+        run: |
+          cd ~/Sttaus
+          git pull
+      - name: "Restart daemon"
+        run: systemctl restart discordbot.service
