@@ -12,4 +12,4 @@ jobs:
           cd ~/Sttaus
           git pull
       - name: "Restart daemon"
-        run: systemctl restart discordbot.service
+        run: sudo systemctl restart discordbot.service
